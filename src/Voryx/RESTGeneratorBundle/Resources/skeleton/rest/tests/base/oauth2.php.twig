@@ -29,15 +29,15 @@ class {{ friendly_format }}BaseCase extends WebTestCase
         $clientManager = $client->getContainer()->get('fos_oauth_server.client_manager.default');
         /** @var OAuthClient $oauth_client */
         $oauth_client = $clientManager->createClient();
-        $oauth_client->setRedirectUris('');
+        $oauth_client->setRedirectUris(array());
         $oauth_client->setAllowedGrantTypes(array('authorization_code', 'password', 'refresh_token', 'client_credentials'));
         $clientManager->updateClient($oauth_client);
 
         $public_key_split = $oauth_client->getPublicId();
         $secret_key_split = $oauth_client->getSecret();
 
-        self::$client_id     = end($public_key_split);
-        self::$client_secret = end($secret_key_split);
+        self::$client_id     = $public_key_split;
+        self::$client_secret = $secret_key_split;
         $this->assertNotEquals(self::$client_id, null);
         $this->assertNotEquals(self::$client_secret, null);
 
