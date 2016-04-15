@@ -1,33 +1,34 @@
-/** @var Client */
-private static $client;
+    /** @var Client */
+    private static $client;
 
-private static $id;
+    private static $id;
 
-private static $sample_object;
+    private static $sample_object;
 
-public function setUp()
-{
-    parent::setUp();
-    self::$client = static::createClient();
+    public function setUp()
+    {
+        parent::setUp();
+        self::$client = static::createClient();
 
-    ${{ entity|lower }}_object                       = array();
-    {#{%- for field, info in fields if info['id'] is not defined or info['id'] == false %}
-    {%- if info['type'] == 'string' %}
-    ${{ entity|lower }}_object['{{ field }}']        = 'test_{{ field }}';
-    {%- if info['type'] == 'text' %}
-    ${{ entity|lower }}_object['{{ field }}']        = 'test_{{ field }}_'.substr(str_shuffle(md5(time())),0,255);
-    {%- elseif info['type'] == 'integer' or info['type'] == 'smallint' or info['type'] == 'bigint' %}
-    ${{ entity|lower }}_object['{{ field }}']        = 1;
-    {%- elseif info['type'] == 'decimal' or info['type'] == 'float' %}
-    ${{ entity|lower }}_object['{{ field }}']        = 1.11;
-    {%- elseif info['type'] == 'boolean' %}
-    ${{ entity|lower }}_object['{{ field }}']        = true;
-    {%- elseif info['type'] == 'date' or info['type'] == 'datetime' or info['type'] == 'datetimetz' or info['type'] == 'time' %}
-    ${{ entity|lower }}_object['{{ field }}']        = new \DateTime('now');
-    {%- else %}
-    ${{ entity|lower }}_object['{{ field }}']        = 'test_hallo :)';
-    {%- endif %}
-    {%- endfor %}#}
+        ${{ entity|lower }}_object                       = array();
+        {%- for field, info in fields if info['id'] is not defined or info['id'] == false %}
+        {%- if info['type'] == 'string' %}
+        ${{ entity|lower }}_object['{{ field }}']        = 'test_{{ field }}';
+        {%- if info['type'] == 'text' %}
+        ${{ entity|lower }}_object['{{ field }}']        = 'test_{{ field }}_'.substr(str_shuffle(md5(time())),0,255);
+        {%- elseif info['type'] == 'integer' or info['type'] == 'smallint' or info['type'] == 'bigint' %}
+        ${{ entity|lower }}_object['{{ field }}']        = 1;
+        {%- elseif info['type'] == 'decimal' or info['type'] == 'float' %}
+        ${{ entity|lower }}_object['{{ field }}']        = 1.11;
+        {%- elseif info['type'] == 'boolean' %}
+        ${{ entity|lower }}_object['{{ field }}']        = true;
+        {%- elseif info['type'] == 'date' or info['type'] == 'datetime' or info['type'] == 'datetimetz' or info['type'] == 'time' %}
+        ${{ entity|lower }}_object['{{ field }}']        = new \DateTime('now');
+        {%- else %}
+        ${{ entity|lower }}_object['{{ field }}']        = 'test_hallo :)';
+        {%- endif %}
+        {%- endfor %}
 
-    self::$sample_object = ${{ entity|lower }}_object;
-}
+        self::$sample_object = ${{ entity|lower }}_object;
+    }
+

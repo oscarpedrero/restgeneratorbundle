@@ -1,6 +1,6 @@
 <?php
 
-namespace {{ namespace }}\Tests\Controller\Base{{ entity_namespace ? '\\' ~ entity_namespace : '' }};
+namespace {{ namespace }}\Tests\Base{{ entity_namespace ? '\\' ~ entity_namespace : '' }};
 
 use {{ namespace }}\Command\CreateOAuthClientCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -19,7 +19,7 @@ class {{ format|capitalize }}BaseCase extends WebTestCase
 
     public function setUp()
     {
-        if ($username === null || $password === null)
+        if ($this->username === null || $this->password === null)
         {
             die('Please make sure to fill in an API user username/password in this file (path/to/Tests/oauthBase.php)');
         }
