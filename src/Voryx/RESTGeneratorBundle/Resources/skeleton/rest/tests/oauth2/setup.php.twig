@@ -11,7 +11,7 @@ public function setUp()
     self::$client = static::createClient();
 
     ${{ entity|lower }}_object                       = array();
-    {%- for field, info in fields if info['id'] is not defined or info['id'] == false %}
+    {#{%- for field, info in fields if info['id'] is not defined or info['id'] == false %}
     {%- if info['type'] == 'string' %}
     ${{ entity|lower }}_object['{{ field }}']        = 'test_{{ field }}';
     {%- if info['type'] == 'text' %}
@@ -24,11 +24,10 @@ public function setUp()
     ${{ entity|lower }}_object['{{ field }}']        = true;
     {%- elseif info['type'] == 'date' or info['type'] == 'datetime' or info['type'] == 'datetimetz' or info['type'] == 'time' %}
     ${{ entity|lower }}_object['{{ field }}']        = new \DateTime('now');
-    {# implement support for array types. #}
     {%- else %}
-    {{ field }}.{{ info.type }}
+    ${{ entity|lower }}_object['{{ field }}']        = 'test_hallo :)';
     {%- endif %}
-    {%- endfor %}
+    {%- endfor %}#}
 
     self::$sample_object = ${{ entity|lower }}_object;
 }

@@ -19,7 +19,7 @@ class {{ entity_class }}RESTControllerTest extends {{ format|capitalize }}BaseCa
 {
 {% block class_body %}
 
-    {%- include 'rest/tests/'{{ format }}'/setup.php.twig' %}
+    {%- include 'rest/tests/{{ format }}/setup.php.twig' %}
 
     {#{%- include 'rest/tests/'{{ format }}'/getAllWithoutContent.php.twig' %}#}
 
