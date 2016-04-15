@@ -166,14 +166,15 @@ EOT
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
         //routing format
+        $format = $input->getOption('format');
         $output->writeln(
             array(
                 '',
-                'Determine the routing format.',
+                'Determine the routing format (yml or annotation).',
                 ''
             )
         );
-        $question = new Question($questionHelper->getQuestion('Routing format', $input->getOption('format')));
+        $question = new Question($questionHelper->getQuestion('Routing format', $format), $format);
         $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateFormat'));
         $format = $questionHelper->ask($input, $output, $question);
 
@@ -203,7 +204,7 @@ EOT
                 ''
             )
         );
-        $question = new Question($questionHelper->getQuestion('What type of tests do you want to generate?', $input->getOption('test')));
+        $question = new Question($questionHelper->getQuestion('What type of tests do you want to generate?', $input->getOption('test')),$input->getOption('test'));
         $question->setValidator(array('Voryx\RESTGeneratorBundle\Command\Validators', 'validateTestFormat'));
         $test = $questionHelper->ask($input, $output, $question);
 
