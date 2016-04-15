@@ -199,8 +199,7 @@ EOT
             array(
                 '',
                 'Determine what kind of test you want to have generated (if any)',
-                '',
-                'Possible values are none, no-authentication and oauth2',
+                'Possible values are none (no tests), no-authentication and oauth2',
                 ''
             )
         );
@@ -209,11 +208,6 @@ EOT
         $test = $questionHelper->ask($input, $output, $question);
 
         $input->setOption('test',$test);
-
-        if ($test === 'oauth2')
-        {
-            $this->interactWithOAuthTestMode($input, $output);
-        }
 
         // summary
         $output->writeln(
@@ -225,23 +219,6 @@ EOT
                 '',
             )
         );
-    }
-
-
-    public function interactWithOAuthTestMode(InputInterface $input, OutputInterface $output)
-    {
-        $questionHelper = $this->getQuestionHelper();
-
-        $input->setOption('test_username', 'apiuser');
-        $input->setOption('test_password', 'password');
-
-        $question = new Question($questionHelper->getQuestion('With what username should we try to authenticate using OAuth2?', $input->getOption('test_username')));
-        $test_username = $questionHelper->ask($input, $output, $question);
-        $input->setOption('test_username', $test_username);
-
-        $question = new Question($questionHelper->getQuestion('And what is the password for '.$test_username.'?', $input->getOption('test_password')));
-        $test_password = $questionHelper->ask($input, $output, $question);
-        $input->setOption('test_password', $test_password);
     }
 
     /**
