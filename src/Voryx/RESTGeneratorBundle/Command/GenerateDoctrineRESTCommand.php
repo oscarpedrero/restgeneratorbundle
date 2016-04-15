@@ -41,7 +41,7 @@ class GenerateDoctrineRESTCommand extends GenerateDoctrineCrudCommand
                 new InputOption('entity', '', InputOption::VALUE_REQUIRED, 'The entity class name to initialize (shortcut notation)'),
                 new InputOption('route-prefix', '', InputOption::VALUE_REQUIRED, 'The route prefix'),
                 new InputOption('format', '', InputOption::VALUE_OPTIONAL, 'The format used for generation of routing (yml or annotation)', 'yml'),
-                new InputOption('test', '', InputOption::VALUE_OPTIONAL, 'Generate a test for the given authentication mode (oauth2, no-authentication, none, csrf)', 'none'),
+                new InputOption('test', '', InputOption::VALUE_OPTIONAL, 'Generate a test for the given authentication mode (oauth2, no-authentication, none)', 'none'),
                 new InputOption('overwrite', '', InputOption::VALUE_NONE, 'Do not stop the generation if rest api controller already exist, thus overwriting all generated files'),
                 new InputOption('resource', '', InputOption::VALUE_NONE, 'The object will return with the resource name'),
                 new InputOption('document', '', InputOption::VALUE_NONE, 'Use NelmioApiDocBundle to document the controller')
@@ -199,7 +199,7 @@ EOT
                 '',
                 'Determine what kind of test you want to have generated (if any)',
                 '',
-                'Possible values are none, no-authentication, csrf and oauth2',
+                'Possible values are none, no-authentication and oauth2',
                 ''
             )
         );
