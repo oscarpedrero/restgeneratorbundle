@@ -209,7 +209,7 @@ EOT
 
         $input->setOption('test',$test);
 
-        if ($test === 'oauth')
+        if ($test === 'oauth2')
         {
             $this->interactWithOAuthTestMode($input, $output);
         }
