@@ -6,7 +6,7 @@
         $crawler = self::$client->request('DELETE', '/{{ route_prefix }}/{{ entity|lower }}/999.json?access_token='.self::$access_token);
         $this->assertEquals(404, self::$client->getResponse()->getStatusCode(), 'Expected a 404 response status after requesting DELETE /{{ route_prefix }}/{{ entity|lower }}/999.json, got '.self::$client->getResponse()->getStatusCode());
 
-        $crawler = self::$client->request('DELETE', '/{{ route_prefix }}/{{ entity|lower }}/'.self::$id.'.json?access_token='.self::$access_token, array(), array(), ['HTTP_CONTENT_TYPE' => 'application/json', 'CONTENT_TYPE' => 'application/json'], $json);
+        $crawler = self::$client->request('DELETE', '/{{ route_prefix }}/{{ entity|lower }}/'.self::$id.'.json?access_token='.self::$access_token);
         $this->assertEquals(204, self::$client->getResponse()->getStatusCode(), 'Expected a 204 response status after requesting DELETE /{{ route_prefix }}/{{ entity|lower }}/'.self::$id.'.json, got '.self::$client->getResponse()->getStatusCode());
     }
 
