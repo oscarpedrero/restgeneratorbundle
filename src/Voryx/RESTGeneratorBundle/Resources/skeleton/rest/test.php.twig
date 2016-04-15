@@ -3,7 +3,7 @@
 namespace {{ namespace }}\Tests\Controller{{ entity_namespace ? '\\' ~ entity_namespace : '' }};
 
 {% block use_statements %}
-use {{ namespace }}\Tests\Base\{{ format|capitalize }}BaseCase;
+use {{ namespace }}\Tests\Base\{{ friendly_format }}BaseCase;
 use Symfony\Bundle\FrameworkBundle\Client;
 {% endblock use_statements %}
 
@@ -14,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Client;
 {% endblock phpdoc_class_header %}
  */
 {% block class_definition %}
-class {{ entity_class }}RESTControllerTest extends {{ format|capitalize }}BaseCase
+class {{ entity_class }}RESTControllerTest extends {{ friendly_format }}BaseCase
 {% endblock class_definition %}
 {
 {% block class_body %}
