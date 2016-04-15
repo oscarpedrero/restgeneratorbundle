@@ -399,6 +399,8 @@ class DoctrineRESTGenerator extends Generator
             return;
         }
 
+        $friendlyFormat = $this->makeFormatUserFriendly($format);
+
         $base_dir = $this->bundle->getPath() . '/Tests/Base';
         $dir = $this->bundle->getPath() . '/Tests/Controller';
 
@@ -407,15 +409,15 @@ class DoctrineRESTGenerator extends Generator
         $entityNamespace = implode('\\', $parts);
 
         $target = $dir . '/' . str_replace('\\', '/', $entityNamespace) . '/' . $entityClass . 'RESTControllerTest.php';
-        $base_target = $base_dir . '/' . str_replace('\\', '/', $entityNamespace) . '/' . ucfirst($format) . 'BaseCase.php';
+        $base_target = $base_dir . '/' . str_replace('\\', '/', $entityNamespace) . '/' . $friendlyFormat . 'BaseCase.php';
 
         if ($forceOverwrite === false && file_exists($target))
         {
             throw new \RuntimeException('Unable to generate the test as it already exists.');
         }
 
-        $friendlyFormat = $this->makeFormatUserFriendly($format);
-        $this->generateBaseTestCaseIfNotExists($forceOverwrite, $friendlyFormat, $base_target);
+
+        $this->generateBaseTestCaseIfNotExists($forceOverwrite, $format, $friendlyFormat, $base_target);
 
         $this->renderFile(
             'rest/test.php.twig',
@@ -441,9 +443,10 @@ class DoctrineRESTGenerator extends Generator
     /**
      * @param $overwrite
      * @param $format
+     * @param $friendlyFormat
      * @param $target
      */
-    protected function generateBaseTestCaseIfNotExists($overwrite, $format, $target)
+    protected function generateBaseTestCaseIfNotExists($overwrite, $format, $friendlyFormat, $target)
     {
         $parts           = explode('\\', $this->entity);
         $entityClass     = array_pop($parts);
@@ -459,6 +462,7 @@ class DoctrineRESTGenerator extends Generator
             $target,
             array(
                 'format'            => $format,
+                'friendly_format'   => $friendlyFormat,
                 'fields'            => $this->metadata->fieldMappings,
                 'route_prefix'      => $this->routePrefix,
                 'route_name_prefix' => $this->routeNamePrefix,
