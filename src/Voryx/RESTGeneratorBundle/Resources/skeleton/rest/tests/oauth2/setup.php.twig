@@ -14,7 +14,7 @@
         {%- for field, info in fields if info['id'] is not defined or info['id'] == false %}
         {%- if info['type'] == 'string' %}
         ${{ entity|lower }}_object['{{ field }}']        = 'test_{{ field }}';
-        {%- if info['type'] == 'text' %}
+        {%- elseif info['type'] == 'text' %}
         ${{ entity|lower }}_object['{{ field }}']        = 'test_{{ field }}_'.substr(str_shuffle(md5(time())),0,255);
         {%- elseif info['type'] == 'integer' or info['type'] == 'smallint' or info['type'] == 'bigint' %}
         ${{ entity|lower }}_object['{{ field }}']        = 1;
