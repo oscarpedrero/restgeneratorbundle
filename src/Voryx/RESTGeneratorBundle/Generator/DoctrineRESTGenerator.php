@@ -88,7 +88,7 @@ class DoctrineRESTGenerator extends Generator
         $this->generateHandler($forceOverwrite, $document);
         $this->generateExceptionClass();
         $this->declareService();
-        $this->generateTestClass($test);
+        $this->generateTestClass($forceOverwrite, $test);
     }
 
     /**
@@ -377,15 +377,17 @@ class DoctrineRESTGenerator extends Generator
 
     /**
      * Generates the functional test class only.
+     * @param boolean $forceOverwrite whether or not to force overwriting or not
      * @param string $format either none, no-authentication or oauth
      */
-    protected function generateTestClass($format)
+    protected function generateTestClass($forceOverwrite, $format)
     {
         if ($format === 'none')
         {
             return;
         }
 
+        $base_dir = $this->bundle->getPath() . '/Tests/Base';
         $dir = $this->bundle->getPath() . '/Tests/Controller';
 
         $parts           = explode('\\', $this->entity);
@@ -393,9 +395,53 @@ class DoctrineRESTGenerator extends Generator
         $entityNamespace = implode('\\', $parts);
 
         $target = $dir . '/' . str_replace('\\', '/', $entityNamespace) . '/' . $entityClass . 'RESTControllerTest.php';
+        $base_target = $base_dir . '/' . str_replace('\\', '/', $entityNamespace) . '/' . ucfirst($format) . 'BaseCase.php';
+
+        if ($forceOverwrite === false && file_exists($target))
+        {
+            throw new \RuntimeException('Unable to generate the test as it already exists.');
+        }
+
+        $this->generateBaseTestCaseIfNotExists($forceOverwrite, $format, $base_target);
 
         $this->renderFile(
             'rest/test.php.twig',
+            $target,
+            array(
+                'format'            => $format,
+                'fields'            => $this->metadata->fieldMappings,
+                'base_file'         => $base_target,
+                'route_prefix'      => $this->routePrefix,
+                'route_name_prefix' => $this->routeNamePrefix,
+                'entity'            => $this->entity,
+                'bundle'            => $this->bundle->getName(),
+                'entity_class'      => $entityClass,
+                'namespace'         => $this->bundle->getNamespace(),
+                'entity_namespace'  => $entityNamespace,
+                'actions'           => $this->actions,
+                'form_type_name'    => strtolower(str_replace('\\', '_', $this->bundle->getNamespace()) . ($parts ? '_' : '') . implode('_', $parts) . '_' . $entityClass . 'Type'),
+            )
+        );
+    }
+
+    /**
+     * @param $overwrite
+     * @param $format
+     * @param $target
+     */
+    protected function generateBaseTestCaseIfNotExists($overwrite, $format, $target)
+    {
+        $parts           = explode('\\', $this->entity);
+        $entityClass     = array_pop($parts);
+        $entityNamespace = implode('\\', $parts);
+
+        if (file_exists($target))
+        {
+            return;
+        }
+
+        $this->renderFile(
+            'rest/tests/base/'.$format.'.php.twig',
             $target,
             array(
                 'format'            => $format,
@@ -408,7 +454,6 @@ class DoctrineRESTGenerator extends Generator
                 'namespace'         => $this->bundle->getNamespace(),
                 'entity_namespace'  => $entityNamespace,
                 'actions'           => $this->actions,
-                'form_type_name'    => strtolower(str_replace('\\', '_', $this->bundle->getNamespace()) . ($parts ? '_' : '') . implode('_', $parts) . '_' . $entityClass . 'Type'),
             )
         );
     }
