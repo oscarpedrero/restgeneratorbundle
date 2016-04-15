@@ -375,6 +375,18 @@ class DoctrineRESTGenerator extends Generator
         );
     }
 
+    private function makeFormatUserFriendly($format)
+    {
+        $returnFormat = '';
+        $parts = explode('-',$format);
+        foreach($parts as $part)
+        {
+            $returnFormat .= ucfirst($part);
+        }
+
+        return $returnFormat;
+    }
+
     /**
      * Generates the functional test class only.
      * @param boolean $forceOverwrite whether or not to force overwriting or not
@@ -402,13 +414,15 @@ class DoctrineRESTGenerator extends Generator
             throw new \RuntimeException('Unable to generate the test as it already exists.');
         }
 
-        $this->generateBaseTestCaseIfNotExists($forceOverwrite, $format, $base_target);
+        $friendlyFormat = $this->makeFormatUserFriendly($format);
+        $this->generateBaseTestCaseIfNotExists($forceOverwrite, $friendlyFormat, $base_target);
 
         $this->renderFile(
             'rest/test.php.twig',
             $target,
             array(
                 'format'            => $format,
+                'friendly_format'   => $friendlyFormat,
                 'fields'            => $this->metadata->fieldMappings,
                 'base_file'         => $base_target,
                 'route_prefix'      => $this->routePrefix,
