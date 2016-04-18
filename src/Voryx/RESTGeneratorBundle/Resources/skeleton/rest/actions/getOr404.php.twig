@@ -11,7 +11,7 @@
 {% endblock method_definition %}
     {
 {% block method_body %}
-        if (!($entity = $this->container->get('{{ bundle|replace({'Bundle': ''})|lower}}.{{ entity|lower|replace('\\':'.') }}.handler')->get($id))) {
+        if (!($entity = $this->container->get('{{ bundle|replace({'Bundle': ''})|lower}}.{{ entity|lower|replace({"\\":'.'}) }}.handler')->get($id))) {
             throw new NotFoundHttpException(sprintf('The resource \'%s\' was not found.',$id));
         }
 

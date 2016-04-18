@@ -35,7 +35,7 @@
 {% block method_body %}
         ${{ entity_class|lower }} = $this->getOr404($id);
         try {
-            return $this->container->get('{{ bundle|replace({'Bundle': ''})|lower}}.{{ entity|lower|replace('\\':'.') }}.handler')->delete(${{ entity_class|lower }});
+            return $this->container->get('{{ bundle|replace({'Bundle': ''})|lower}}.{{ entity|lower|replace({"\\":'.'}) }}.handler')->delete(${{ entity_class|lower }});
         } catch (\Exception $exception) {
             throw new \RuntimeException("Exclusion not allowed");
         }
