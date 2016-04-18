@@ -449,7 +449,7 @@ class DoctrineRESTGenerator extends Generator
         $entityNamespace = implode('\\', $parts);
 
         $target = $dir . '/' . str_replace('\\', '/', $entityNamespace) . '/' . $entityClass . 'RESTControllerTest.php';
-        $base_target = $base_dir . '/' . str_replace('\\', '/', $entityNamespace) . '/' . $friendlyFormat . 'BaseCase.php';
+        $base_target = $base_dir . '/' . $friendlyFormat . 'BaseCase.php';
 
         if ($forceOverwrite === false && file_exists($target))
         {
