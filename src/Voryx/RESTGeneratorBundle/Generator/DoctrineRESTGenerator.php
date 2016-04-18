@@ -384,8 +384,20 @@ class DoctrineRESTGenerator extends Generator
      */
     private function updateDIFile($fileName, $serviceFormat)
     {
-        $toInput = PHP_EOL . "\t\t\$loader2 = new Loader\\XmlFileLoader(\$container, new FileLocator(__DIR__ . '/../Resources/config'));" . PHP_EOL .
-            "\t\t\$loader2->load('servicesREST.".$serviceFormat."');" . PHP_EOL . "\t";
+        $toInput = '';
+        switch($serviceFormat)
+        {
+            case 'xml':
+                $toInput = PHP_EOL . "\t\t\$loader2 = new Loader\\XmlFileLoader(\$container, new FileLocator(__DIR__ . '/../Resources/config'));" . PHP_EOL .
+                    "\t\t\$loader2->load('servicesREST.".$serviceFormat."');" . PHP_EOL . "\t";
+                break;
+            case 'yml':
+            default:
+            $toInput = PHP_EOL . "\t\t\$loader2 = new Loader\\YamlFileLoader(\$container, new FileLocator(__DIR__ . '/../Resources/config'));" . PHP_EOL .
+                "\t\t\$loader2->load('servicesREST.".$serviceFormat."');" . PHP_EOL . "\t";
+            break;
+
+        }
 
         if (!file_exists(dirname($fileName)))
         {
