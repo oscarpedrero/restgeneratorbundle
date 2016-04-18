@@ -47,6 +47,14 @@
 
         ${{ entity|lower }}_object['{{ field }}'] = new \DateTime('now');
 
+            {%- elseif info['type'] == 'dateinterval' %}
+
+        ${{ entity|lower }}_object['{{ field }}'] = new \DateInterval('P2Y4DT6H8M');
+
+            {%- elseif info['type'] == 'array' or info['type'] == 'simple_array' or info['type'] == 'json_array' %}
+
+        ${{ entity|lower }}_object['{{ field }}'] = array('{{ field }}_1','{{ field }}_2');
+
             {%- else %}
 
         ${{ entity|lower }}_object['{{ field }}'] = 'unknown_field_value';
