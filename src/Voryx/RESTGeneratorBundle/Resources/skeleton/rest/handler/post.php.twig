@@ -10,7 +10,7 @@
 {% endblock method_definition %}
     {
 {% block method_body %}
-        ${{ entityClass|lower }} = $this->create{{ entity_class }}();
+        ${{ entity_class|lower }} = $this->create{{ entity_class }}();
 
         return $this->processForm(${{ entity_class|lower }}, $parameters, 'POST');
 {% endblock method_body %}
