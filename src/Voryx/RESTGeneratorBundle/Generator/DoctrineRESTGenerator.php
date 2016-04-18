@@ -352,7 +352,8 @@ class DoctrineRESTGenerator extends Generator
     {
         $yml_file = Yaml::parse(file_get_contents($services));
         $yml_file['services'] = array($newId => array('class' => $handlerClass, 'arguments' => array('@doctrine.orm.entity_manager','@form.factory')));
-        Yaml::dump($yml_file);
+        $yml_content = Yaml::dump($yml_file);
+        file_put_contents($services, $yml_content);
     }
 
     /**
