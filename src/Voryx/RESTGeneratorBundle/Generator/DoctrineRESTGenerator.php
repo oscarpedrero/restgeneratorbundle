@@ -268,6 +268,7 @@ class DoctrineRESTGenerator extends Generator
 
         $bundleName = strtolower($this->bundle->getName());
         $entityName = strtolower($this->entity);
+        $entityName = str_replace('\\','.',$entityName);
 
         $services = sprintf(
             "%s/Resources/config/servicesREST.".$service_format,
@@ -351,8 +352,21 @@ class DoctrineRESTGenerator extends Generator
     private function handleServiceDeclarationAsYML($services, $newId, $handlerClass,$namespace,$entityNamespace,$entityClass,$fileName)
     {
         $yml_file = Yaml::parse(file_get_contents($services));
-        $yml_file['services'] = array($newId => array('class' => $handlerClass, 'arguments' => array('@doctrine.orm.entity_manager','@form.factory')));
-        $yml_content = Yaml::dump($yml_file);
+        $yml_file['services'] = array(
+            $newId => array(
+                'class' => $handlerClass, 'arguments' => array(
+                    '@doctrine.orm.entity_manager',
+                    sprintf(
+                        "%s\\Entity\\%s%s",
+                        $namespace,
+                        $entityNamespace,
+                        $entityClass
+                    ),
+                    '@form.factory'
+                )
+            )
+        );
+        $yml_content = Yaml::dump($yml_file, 3);
         file_put_contents($services, $yml_content);
     }
 

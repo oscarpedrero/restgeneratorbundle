@@ -24,10 +24,10 @@
 
 {% if document %}
     /**
-     * @return {{ entity }} ${{ entity|lower }}
+     * @return {{ entityClass }} ${{ entityClass|lower }}
      */
 {% endif %}
-    private function create{{ entity }}()
+    private function create{{ entityClass }}()
     {
         return new $this->entityClass();
     }
