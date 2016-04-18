@@ -426,6 +426,7 @@ class DoctrineRESTGenerator extends Generator
                 'format'            => $format,
                 'friendly_format'   => $friendlyFormat,
                 'fields'            => $this->metadata->fieldMappings,
+                'assoc_mapping'     => $this->metadata->associationMappings,
                 'base_file'         => $base_target,
                 'route_prefix'      => $this->routePrefix,
                 'route_name_prefix' => $this->routeNamePrefix,

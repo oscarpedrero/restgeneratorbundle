@@ -10,6 +10,17 @@
         parent::setUp();
         self::$client = static::createClient();
 
+        {%- for key => assoc in assoc_mapping %}
+            {%- if assoc['type'] == 2 and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 2 == ManyToOne #}
+
+        $assoc{{ key }} = array();
+        $field{{ assoc['fieldName']|capitalize }} = new {{ assoc['targetEntity'] }};
+        //set fields of $field{{ assoc['fieldName']|capitalize }}.
+        $assoc{{ key }}[] = $field{{ assoc['fieldName']|capitalize }};
+
+            {% endif %}
+        {%- endfor %}
+
         ${{ entity|lower }}_object = array();
         {%- for field, info in fields if info['id'] is not defined or info['id'] == false -%}
             {%- if info['type'] == 'string' %}
@@ -43,6 +54,13 @@
             {%- endif -%}
         {%- endfor %}
 
+        {%- for key => assoc in assoc_mapping %}
+            {%- if assoc['type'] == 2 and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 2 == ManyToOne #}
+
+        ${{ entity|lower }}_object['{{ assoc['fieldName'] }}'] = $assoc{{ key }};
+
+            {% endif %}
+        {%- endfor %}
         self::$sample_object = ${{ entity|lower }}_object;
     }
 
