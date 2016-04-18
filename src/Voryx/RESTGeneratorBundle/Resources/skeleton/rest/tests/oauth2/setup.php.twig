@@ -21,43 +21,43 @@
             {% endif %}
         {%- endfor %}
 
-        ${{ entity|lower }}_object = array();
+        ${{ entity_class|lower }}_object = array();
         {%- for field, info in fields if info['id'] is not defined or info['id'] == false -%}
             {%- if info['type'] == 'string' %}
 
-        ${{ entity|lower }}_object['{{ field }}'] = 'test_{{ field }}';
+        ${{ entity_class|lower }}_object['{{ field }}'] = 'test_{{ field }}';
 
             {%- elseif info['type'] == 'text' %}
 
-        ${{ entity|lower }}_object['{{ field }}'] = 'test_{{ field }}_'.substr(str_shuffle(md5(time())),0,255);
+        ${{ entity_class|lower }}_object['{{ field }}'] = 'test_{{ field }}_'.substr(str_shuffle(md5(time())),0,255);
 
             {%- elseif info['type'] == 'integer' or info['type'] == 'smallint' or info['type'] == 'bigint' %}
 
-        ${{ entity|lower }}_object['{{ field }}'] = 1;
+        ${{ entity_class|lower }}_object['{{ field }}'] = 1;
 
             {%- elseif info['type'] == 'decimal' or info['type'] == 'float' %}
 
-        ${{ entity|lower }}_object['{{ field }}'] = 1.11;
+        ${{ entity_class|lower }}_object['{{ field }}'] = 1.11;
 
             {%- elseif info['type'] == 'boolean' %}
 
-        ${{ entity|lower }}_object['{{ field }}'] = true;
+        ${{ entity_class|lower }}_object['{{ field }}'] = true;
 
             {%- elseif info['type'] == 'date' or info['type'] == 'datetime' or info['type'] == 'datetimetz' or info['type'] == 'time' %}
 
-        ${{ entity|lower }}_object['{{ field }}'] = new \DateTime('now');
+        ${{ entity_class|lower }}_object['{{ field }}'] = new \DateTime('now');
 
             {%- elseif info['type'] == 'dateinterval' %}
 
-        ${{ entity|lower }}_object['{{ field }}'] = new \DateInterval('P2Y4DT6H8M');
+        ${{ entity_class|lower }}_object['{{ field }}'] = new \DateInterval('P2Y4DT6H8M');
 
             {%- elseif info['type'] == 'array' or info['type'] == 'simple_array' or info['type'] == 'json_array' %}
 
-        ${{ entity|lower }}_object['{{ field }}'] = array('{{ field }}_1','{{ field }}_2');
+        ${{ entity_class|lower }}_object['{{ field }}'] = array('{{ field }}_1','{{ field }}_2');
 
             {%- else %}
 
-        ${{ entity|lower }}_object['{{ field }}'] = 'unknown_field_value';
+        ${{ entity_class|lower }}_object['{{ field }}'] = 'unknown_field_value';
 
             {%- endif -%}
         {%- endfor %}
@@ -65,10 +65,10 @@
         {%- for key, assoc in assoc_mapping %}
             {%- if assoc['type'] == 2 and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 2 == ManyToOne #}
 
-        ${{ entity|lower }}_object['{{ assoc['fieldName'] }}'] = $assoc{{ key }};
+        ${{ entity_class|lower }}_object['{{ assoc['fieldName'] }}'] = $assoc{{ key }};
 
             {% endif %}
         {%- endfor %}
-        self::$sample_object = ${{ entity|lower }}_object;
+        self::$sample_object = ${{ entity_class|lower }}_object;
     }
 
