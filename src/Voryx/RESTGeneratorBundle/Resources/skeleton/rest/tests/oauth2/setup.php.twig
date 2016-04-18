@@ -10,7 +10,7 @@
         parent::setUp();
         self::$client = static::createClient();
 
-        {%- for key => assoc in assoc_mapping %}
+        {%- for key, assoc in assoc_mapping %}
             {%- if assoc['type'] == 2 and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 2 == ManyToOne #}
 
         $assoc{{ key }} = array();
@@ -62,7 +62,7 @@
             {%- endif -%}
         {%- endfor %}
 
-        {%- for key => assoc in assoc_mapping %}
+        {%- for key, assoc in assoc_mapping %}
             {%- if assoc['type'] == 2 and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 2 == ManyToOne #}
 
         ${{ entity|lower }}_object['{{ assoc['fieldName'] }}'] = $assoc{{ key }};
