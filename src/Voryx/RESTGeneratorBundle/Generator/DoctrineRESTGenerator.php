@@ -358,7 +358,7 @@ class DoctrineRESTGenerator extends Generator
         $yml_file = Yaml::parse(file_get_contents($services));
         $yml_file['parameters'] = array(
             $newId.'.handler_class' => $handlerClass,
-            $newId.'entity_class' => sprintf(
+            $newId.'.entity_class' => sprintf(
                 "%s\\Entity\\%s%s",
                 $namespace,
                 $entityNamespace,
@@ -369,7 +369,7 @@ class DoctrineRESTGenerator extends Generator
             $newId => array(
                 'class' => '%'.$newId.'.handler_class%', 'arguments' => array(
                     '@doctrine.orm.entity_manager',
-                    '%'.$newId.'entity_class%',
+                    '%'.$newId.'.entity_class%',
                     '@form.factory'
                 )
             )
