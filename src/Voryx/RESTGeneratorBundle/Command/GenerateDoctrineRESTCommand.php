@@ -40,8 +40,9 @@ class GenerateDoctrineRESTCommand extends GenerateDoctrineCrudCommand
             array(
                 new InputOption('entity', '', InputOption::VALUE_REQUIRED, 'The entity class name to initialize (shortcut notation)'),
                 new InputOption('route-prefix', '', InputOption::VALUE_REQUIRED, 'The route prefix'),
-                new InputOption('format', '', InputOption::VALUE_OPTIONAL, 'The format used for generation of routing (yml or annotation)', 'yml'),
-                new InputOption('test', '', InputOption::VALUE_OPTIONAL, 'Generate a test for the given authentication mode (oauth2, no-authentication, none)', 'none'),
+                new InputOption('route-format', '', InputOption::VALUE_REQUIRED, 'The format used for generation of routing (yml or annotation)', 'yml'),
+                new InputOption('service-format', '', InputOption::VALUE_REQUIRED, 'The format used for generation of services (yml or xml)', 'yml'),
+                new InputOption('test', '', InputOption::VALUE_REQUIRED, 'Generate a test for the given authentication mode (oauth2, no-authentication, none)', 'none'),
                 new InputOption('overwrite', '', InputOption::VALUE_NONE, 'Do not stop the generation if rest api controller already exist, thus overwriting all generated files'),
                 new InputOption('resource', '', InputOption::VALUE_NONE, 'The object will return with the resource name'),
                 new InputOption('document', '', InputOption::VALUE_NONE, 'Use NelmioApiDocBundle to document the controller')
@@ -94,7 +95,8 @@ EOT
         $entity = Validators::validateEntityName($input->getOption('entity'));
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
-        $format         = $input->getOption('format');
+        $format         = $input->getOption('route-format');
+        $service_format = $input->getOption('service-format');
         $prefix         = $this->getRoutePrefix($input, $entity);
         /** @var bool $forceOverwrite */
         $forceOverwrite = $input->getOption('overwrite');
@@ -110,7 +112,7 @@ EOT
 
         /** @var DoctrineRESTGenerator $generator */
         $generator = $this->getGenerator($bundle);
-        $generator->generate($bundle, $entity, $metadata[0], $prefix, $forceOverwrite, $resource, $document, $format, $test);
+        $generator->generate($bundle, $entity, $metadata[0], $prefix, $forceOverwrite, $resource, $document, $format, $service_format, $test);
 
         $output->writeln('Generating the REST api code: <info>OK</info>');
         if ($test === 'oauth2')
@@ -166,7 +168,7 @@ EOT
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
         //routing format
-        $format = $input->getOption('format');
+        $format = $input->getOption('route-format');
         $output->writeln(
             array(
                 '',
@@ -178,7 +180,7 @@ EOT
         $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateFormat'));
         $format = $questionHelper->ask($input, $output, $question);
 
-        $input->setOption('format',$format);
+        $input->setOption('route-format',$format);
 
         // route prefix
         $prefix = 'api';
@@ -193,6 +195,21 @@ EOT
 
         $prefix = $questionHelper->ask($input, $output, new Question($questionHelper->getQuestion('Routes prefix', '/' . $prefix), '/' . $prefix));
         $input->setOption('route-prefix', $prefix);
+
+        //service format
+        $serviceFormat = $input->getOption('service-format');
+        $output->writeln(
+            array(
+                '',
+                'Determine the service format (yml or xml).',
+                ''
+            )
+        );
+        $question = new Question($questionHelper->getQuestion('Service format', $serviceFormat), $serviceFormat);
+        $question->setValidator(array('Voryx\RESTGeneratorBundle\Command\Validators', 'validateServiceFormat'));
+        $serviceFormat = $questionHelper->ask($input, $output, $question);
+
+        $input->setOption('service-format',$serviceFormat);
 
         //testing mode
         $output->writeln(

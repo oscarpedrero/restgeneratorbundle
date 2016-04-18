@@ -16,6 +16,8 @@ use Sensio\Bundle\GeneratorBundle\Generator\Generator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Generates a REST controller.
@@ -59,9 +61,10 @@ class DoctrineRESTGenerator extends Generator
      * @param bool $resource
      * @param bool $document Whether or not to use Nelmio api documentation
      * @param string $format Format of routing
+     * @param string $service_format Format of service generation
      * @param string $test Test-mode (none, oauth or no-authentication)
      */
-    public function generate(BundleInterface $bundle,$entity,ClassMetadataInfo $metadata,$routePrefix,$forceOverwrite,$resource,$document,$format, $test)
+    public function generate(BundleInterface $bundle,$entity,ClassMetadataInfo $metadata,$routePrefix,$forceOverwrite,$resource,$document,$format, $service_format, $test)
     {
         $this->routePrefix = $routePrefix;
         $this->routeNamePrefix = str_replace('/', '_', $routePrefix);
@@ -87,7 +90,7 @@ class DoctrineRESTGenerator extends Generator
         $this->generateControllerClass($forceOverwrite, $document, $resource);
         $this->generateHandler($forceOverwrite, $document);
         $this->generateExceptionClass();
-        $this->declareService();
+        $this->declareService($service_format);
         $this->generateTestClass($forceOverwrite, $test);
     }
 
@@ -252,8 +255,9 @@ class DoctrineRESTGenerator extends Generator
 
     /**
      * Declares the handler as a service
+     * @param $service_format
      */
-    public function declareService()
+    public function declareService($service_format)
     {
         $dir = $this->bundle->getPath();
 
@@ -266,7 +270,7 @@ class DoctrineRESTGenerator extends Generator
         $entityName = strtolower($this->entity);
 
         $services = sprintf(
-            "%s/Resources/config/servicesREST.xml",
+            "%s/Resources/config/servicesREST.".$service_format,
             $dir
         );
 
@@ -290,9 +294,24 @@ class DoctrineRESTGenerator extends Generator
         );
 
         if (!is_file($services)) {
-            $this->renderFile("rest/service/services.xml.twig", $services, array());
+            $this->renderFile("rest/service/services.".$service_format.".twig", $services, array());
         }
 
+        switch($service_format)
+        {
+            case 'xml':
+                $this->handleServiceDeclarationAsXML($services,$newId, $handlerClass,$namespace,$entityNamespace,$entityClass,$fileName);
+                break;
+            case 'yml':
+            default:
+            $this->handleServiceDeclarationAsYML($services,$newId, $handlerClass,$namespace,$entityNamespace,$entityClass,$fileName);
+                break;
+
+        }
+    }
+
+    private function handleServiceDeclarationAsXML($services, $newId, $handlerClass,$namespace,$entityNamespace,$entityClass,$fileName)
+    {
         //this could be saved more readable by using dom_import_simplexml (http://stackoverflow.com/questions/1191167/format-output-of-simplexml-asxml)
         $newXML = simplexml_load_file($services);
 
@@ -329,6 +348,13 @@ class DoctrineRESTGenerator extends Generator
         $this->updateDIFile($fileName);
     }
 
+    private function handleServiceDeclarationAsYML($services, $newId, $handlerClass,$namespace,$entityNamespace,$entityClass,$fileName)
+    {
+        $yml_file = Yaml::parse(file_get_contents($services));
+        $yml_file['services'] = array($newId => array('class' => $handlerClass, 'arguments' => array('@doctrine.orm.entity_manager','@form.factory')));
+        Yaml::dump($yml_file);
+    }
+
     /**
      * @param $fileName
      */
@@ -337,7 +363,6 @@ class DoctrineRESTGenerator extends Generator
         $toInput = PHP_EOL . "\t\t\$loader2 = new Loader\\XmlFileLoader(\$container, new FileLocator(__DIR__ . '/../Resources/config'));" . PHP_EOL .
             "\t\t\$loader2->load('servicesREST.xml');" . PHP_EOL . "\t";
 
-        $text = '';
         if (!file_exists(dirname($fileName)))
         {
             mkdir(dirname($fileName), 0777, true);
