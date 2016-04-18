@@ -264,6 +264,10 @@ class DoctrineRESTGenerator extends Generator
         $parts = explode('\\', $this->entity);
         $entityClass = array_pop($parts);
         $entityNamespace = implode('\\', $parts);
+        if (strlen($entityNamespace) > 0)
+        {
+            $entityNamespace .= '\\';
+        }
         $namespace = $this->bundle->getNamespace();
 
         $bundleName = strtolower($this->bundle->getName());
@@ -309,6 +313,7 @@ class DoctrineRESTGenerator extends Generator
                 break;
 
         }
+        $this->updateDIFile($fileName,$service_format);
     }
 
     private function handleServiceDeclarationAsXML($services, $newId, $handlerClass,$namespace,$entityNamespace,$entityClass,$fileName)
@@ -346,22 +351,25 @@ class DoctrineRESTGenerator extends Generator
         }
 
         $newXML->saveXML($services);
-        $this->updateDIFile($fileName);
     }
 
     private function handleServiceDeclarationAsYML($services, $newId, $handlerClass,$namespace,$entityNamespace,$entityClass,$fileName)
     {
         $yml_file = Yaml::parse(file_get_contents($services));
+        $yml_file['parameters'] = array(
+            $newId.'.handler_class' => $handlerClass,
+            $newId.'entity_class' => sprintf(
+                "%s\\Entity\\%s%s",
+                $namespace,
+                $entityNamespace,
+                $entityClass
+            )
+        );
         $yml_file['services'] = array(
             $newId => array(
-                'class' => $handlerClass, 'arguments' => array(
+                'class' => '%'.$newId.'.handler_class%', 'arguments' => array(
                     '@doctrine.orm.entity_manager',
-                    sprintf(
-                        "%s\\Entity\\%s%s",
-                        $namespace,
-                        $entityNamespace,
-                        $entityClass
-                    ),
+                    '%'.$newId.'entity_class%',
                     '@form.factory'
                 )
             )
@@ -372,11 +380,12 @@ class DoctrineRESTGenerator extends Generator
 
     /**
      * @param $fileName
+     * @param $serviceFormat
      */
-    private function updateDIFile($fileName)
+    private function updateDIFile($fileName, $serviceFormat)
     {
         $toInput = PHP_EOL . "\t\t\$loader2 = new Loader\\XmlFileLoader(\$container, new FileLocator(__DIR__ . '/../Resources/config'));" . PHP_EOL .
-            "\t\t\$loader2->load('servicesREST.xml');" . PHP_EOL . "\t";
+            "\t\t\$loader2->load('servicesREST.".$serviceFormat."');" . PHP_EOL . "\t";
 
         if (!file_exists(dirname($fileName)))
         {
@@ -388,7 +397,7 @@ class DoctrineRESTGenerator extends Generator
         }
         $text = file_get_contents($fileName);
 
-        if (strpos($text, "servicesREST.xml") == false) {
+        if (strpos($text, "servicesREST.".$serviceFormat) == false) {
             $position = strpos($text, "}", strpos($text, "function load("));
 
             $newContent = substr_replace($text, $toInput, $position, 0);
@@ -405,7 +414,7 @@ class DoctrineRESTGenerator extends Generator
         $entityNamespace = implode('\\', $parts);
 
         $this->renderFile(
-            'rest//extension.php.twig',
+            'rest/extension.php.twig',
             $fileName,
             array(
                 'class_name'        => str_replace("Bundle", "Extension", $this->bundle->getName()),
