@@ -13,14 +13,14 @@
         {%- for key, assoc in assoc_mapping %}
             {%- if (assoc['type'] == 4 or assoc['type'] == 8) and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 4 == OneToMany, type 8 == ManyToMany #}
 
-        $assoc{{ key }} = array();
+        $assoc_{{ key }} = array();
         $field{{ assoc['fieldName']|capitalize }} = new \{{ assoc['targetEntity'] }};
         //set fields of $field{{ assoc['fieldName']|capitalize }}.
-        $assoc{{ key }}[] = $field{{ assoc['fieldName']|capitalize }};
+        $assoc_{{ key }}[] = $field{{ assoc['fieldName']|capitalize }};
 
             {%- elseif (assoc['type'] == 1 or assoc['type'] == 2) and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 1 == OneToOne, type 2 == ManyToOne #}
 
-        $assoc{{ key }} = new \{{ assoc['targetEntity'] }};
+        $assoc_{{ key }} = new \{{ assoc['targetEntity'] }};
 
             {% endif %}
         {%- endfor %}
@@ -69,7 +69,7 @@
         {%- for key, assoc in assoc_mapping %}
             {%- if (assoc['type'] == 4 or assoc['type'] == 2) and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 2 == ManyToOne, type 4 == OneToMany #}
 
-        ${{ entity_class|lower }}_object['{{ assoc['fieldName'] }}'] = $assoc{{ key }};
+        ${{ entity_class|lower }}_object['{{ assoc['fieldName'] }}'] = $assoc_{{ key }};
 
             {% endif %}
         {%- endfor %}
