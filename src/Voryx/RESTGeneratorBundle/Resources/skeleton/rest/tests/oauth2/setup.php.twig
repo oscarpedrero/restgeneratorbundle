@@ -20,7 +20,7 @@
 
             {%- elseif (assoc['type'] == 1 or assoc['type'] == 2) and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 1 == OneToOne, type 2 == ManyToOne #}
 
-        $assoc{{ key }} = new \{{ assoc['targetEntity'] }}
+        $assoc{{ key }} = new \{{ assoc['targetEntity'] }};
 
             {% endif %}
         {%- endfor %}
