@@ -356,24 +356,34 @@ class DoctrineRESTGenerator extends Generator
     private function handleServiceDeclarationAsYML($services, $newId, $handlerClass,$namespace,$entityNamespace,$entityClass,$fileName)
     {
         $yml_file = Yaml::parse(file_get_contents($services));
-        $yml_file['parameters'] = array(
-            $newId.'.handler_class' => $handlerClass,
-            $newId.'.entity_class' => sprintf(
-                "%s\\Entity\\%s%s",
-                $namespace,
-                $entityNamespace,
-                $entityClass
-            )
-        );
-        $yml_file['services'] = array(
-            $newId => array(
-                'class' => '%'.$newId.'.handler_class%', 'arguments' => array(
-                    '@doctrine.orm.entity_manager',
-                    '%'.$newId.'.entity_class%',
-                    '@form.factory'
+        $params = $yml_file['parameters'];
+        $yml_file['parameters'] =
+            array_merge(
+                $params,
+                array(
+                    $newId.'.handler_class' => $handlerClass,
+                    $newId.'.entity_class' => sprintf(
+                        "%s\\Entity\\%s%s",
+                        $namespace,
+                        $entityNamespace,
+                        $entityClass
+                    )
                 )
-            )
-        );
+            );
+        $yml_services = $yml_file['services'];
+        $yml_file['services'] =
+            array_merge(
+                $yml_services,
+                array(
+                    $newId => array(
+                        'class' => '%'.$newId.'.handler_class%', 'arguments' => array(
+                            '@doctrine.orm.entity_manager',
+                            '%'.$newId.'.entity_class%',
+                            '@form.factory'
+                        )
+                    )
+                )
+            );
         $yml_content = Yaml::dump($yml_file, 3);
         file_put_contents($services, $yml_content);
     }

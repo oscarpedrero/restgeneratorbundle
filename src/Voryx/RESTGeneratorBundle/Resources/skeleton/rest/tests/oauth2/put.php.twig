@@ -12,8 +12,5 @@
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode(), 'Expected a 200 response status after requesting PUT /{{ route_prefix }}/{{ entity|lower }}/'.self::$id.'.json, got '.self::$client->getResponse()->getStatusCode()."\r\nResponse:\r\n".self::$client->getResponse()->getContent());
 
         $obj = json_decode(self::$client->getResponse()->getContent());
-        //test response content
-        //$this->assertEquals($put_name, $obj->name, 'name did not change after PUT');
-        //$this->assertEquals($put_description, $obj->description, 'description did not change after PUT');
     }
 
