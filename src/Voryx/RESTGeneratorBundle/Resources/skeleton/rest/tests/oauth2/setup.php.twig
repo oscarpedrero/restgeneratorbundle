@@ -22,7 +22,7 @@
 
         $assoc_{{ key }} = new \{{ assoc['targetEntity'] }};
 
-            {% endif %}
+            {%- endif %}
         {%- endfor %}
 
         ${{ entity_class|lower }}_object = array();
@@ -71,7 +71,7 @@
 
         ${{ entity_class|lower }}_object['{{ assoc['fieldName'] }}'] = $assoc_{{ key }};
 
-            {% endif %}
+            {%- endif %}
         {%- endfor %}
 
         self::$sample_object = ${{ entity_class|lower }}_object;
