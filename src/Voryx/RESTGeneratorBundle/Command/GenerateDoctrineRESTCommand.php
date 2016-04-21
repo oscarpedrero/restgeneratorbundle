@@ -125,6 +125,10 @@ EOT
         catch(\Exception $ex)
         {
             $constraint_metadata = null;
+        }
+
+        if ($constraint_metadata === null)
+        {
             if ($test !== 'none')
             {
                 $output->writeln('<error>No class constraint metadata factory found for entity ' . $entity . '</error>');
