@@ -1,48 +1,86 @@
-    /** @var Client */
-    private static $client;
+/** @var Client */
+private static $client;
 
-    private static $id;
+private static $id;
 
-    private static $sample_object;
+private static $sample_object;
 
-    public function setUp()
-    {
-        parent::setUp();
-        self::$client = static::createClient();
+public function setUp()
+{
+parent::setUp();
+self::$client = static::createClient();
+//$em = self::$client->getContainer()->get('doctrine');
 
-        ${{ entity|lower }}_object = array();
-        {%- for field, info in fields if info['id'] is not defined or info['id'] == false -%}
-            {%- if info['type'] == 'string' %}
+//create assocation fields (relations from this entity)
+{%- for key, assoc in assoc_mapping %}
+    {%- if (assoc['type'] == 4 or assoc['type'] == 8) and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 4 == OneToMany, type 8 == ManyToMany #}
 
-        ${{ entity|lower }}_object['{{ field }}'] = 'test_{{ field }}';
+        $assoc_{{ key }} = array();
+        $field_{{ assoc['fieldName']|capitalize }} = new \{{ assoc['targetEntity'] }};
+        //set fields of $field_{{ assoc['fieldName']|capitalize }}.
+        $assoc_{{ key }}[] = $field_{{ assoc['fieldName']|capitalize }};
 
-            {%- elseif info['type'] == 'text' %}
 
-        ${{ entity|lower }}_object['{{ field }}'] = 'test_{{ field }}_'.substr(str_shuffle(md5(time())),0,255);
+    {%- elseif (assoc['type'] == 1 or assoc['type'] == 2) and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 1 == OneToOne, type 2 == ManyToOne #}
 
-            {%- elseif info['type'] == 'integer' or info['type'] == 'smallint' or info['type'] == 'bigint' %}
+        $assoc_{{ key }} = new \{{ assoc['targetEntity'] }};
 
-        ${{ entity|lower }}_object['{{ field }}'] = 1;
 
-            {%- elseif info['type'] == 'decimal' or info['type'] == 'float' %}
+    {%- endif %}
+{%- endfor %}
 
-        ${{ entity|lower }}_object['{{ field }}'] = 1.11;
+//create main object
+${{ entity_class|lower }}_object = array();
+{%- for field, info in fields if info['id'] is not defined or info['id'] == false -%}
+    {%- if info['type'] == 'string' %}
 
-            {%- elseif info['type'] == 'boolean' %}
+        ${{ entity_class|lower }}_object['{{ field }}'] = 'test_{{ field }}';
 
-        ${{ entity|lower }}_object['{{ field }}'] = true;
+    {%- elseif info['type'] == 'text' %}
 
-            {%- elseif info['type'] == 'date' or info['type'] == 'datetime' or info['type'] == 'datetimetz' or info['type'] == 'time' %}
+        ${{ entity_class|lower }}_object['{{ field }}'] = 'test_{{ field }}_'.substr(str_shuffle(md5(time())),0,255);
 
-        ${{ entity|lower }}_object['{{ field }}'] = new \DateTime('now');
+    {%- elseif info['type'] == 'integer' or info['type'] == 'smallint' or info['type'] == 'bigint' %}
 
-            {%- else %}
+        ${{ entity_class|lower }}_object['{{ field }}'] = 1;
 
-        ${{ entity|lower }}_object['{{ field }}'] = 'unknown_field_value';
+    {%- elseif info['type'] == 'decimal' or info['type'] == 'float' %}
 
-            {%- endif -%}
-        {%- endfor %}
+        ${{ entity_class|lower }}_object['{{ field }}'] = 1.11;
 
-        self::$sample_object = ${{ entity|lower }}_object;
-    }
+    {%- elseif info['type'] == 'boolean' %}
+
+        ${{ entity_class|lower }}_object['{{ field }}'] = true;
+
+    {%- elseif info['type'] == 'date' or info['type'] == 'datetime' or info['type'] == 'datetimetz' or info['type'] == 'time' %}
+
+        ${{ entity_class|lower }}_object['{{ field }}'] = new \DateTime('now');
+
+    {%- elseif info['type'] == 'dateinterval' %}
+
+        ${{ entity_class|lower }}_object['{{ field }}'] = new \DateInterval('P2Y4DT6H8M');
+
+    {%- elseif info['type'] == 'array' or info['type'] == 'simple_array' or info['type'] == 'json_array' %}
+
+        ${{ entity_class|lower }}_object['{{ field }}'] = array('{{ field }}_1','{{ field }}_2');
+
+    {%- else %}
+
+        ${{ entity_class|lower }}_object['{{ field }}'] = 'unknown_field_value';
+
+    {%- endif -%}
+{%- endfor %}
+
+
+//add associations to mapping
+{%- for key, assoc in assoc_mapping %}
+    {%- if (assoc['type'] == 4 or assoc['type'] == 2) and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 2 == ManyToOne, type 4 == OneToMany #}
+
+        ${{ entity_class|lower }}_object['{{ assoc['fieldName'] }}'] = $assoc_{{ key }};
+
+    {%- endif %}
+{%- endfor %}
+
+self::$sample_object = ${{ entity_class|lower }}_object;
+}
 

@@ -9,24 +9,25 @@
     {
         parent::setUp();
         self::$client = static::createClient();
-
+        //$em = self::$client->getContainer()->get('doctrine');
 
         //create assocation fields (relations from this entity)
         {%- for key, assoc in assoc_mapping %}
             {%- if (assoc['type'] == 4 or assoc['type'] == 8) and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 4 == OneToMany, type 8 == ManyToMany #}
 
         $assoc_{{ key }} = array();
-        $field{{ assoc['fieldName']|capitalize }} = new \{{ assoc['targetEntity'] }};
-        //set fields of $field{{ assoc['fieldName']|capitalize }}.
-        $assoc_{{ key }}[] = $field{{ assoc['fieldName']|capitalize }};
+        $field_{{ assoc['fieldName']|capitalize }} = new \{{ assoc['targetEntity'] }};
+        //set fields of $field_{{ assoc['fieldName']|capitalize }}.
+        $assoc_{{ key }}[] = $field_{{ assoc['fieldName']|capitalize }};
+
 
             {%- elseif (assoc['type'] == 1 or assoc['type'] == 2) and assoc['targetEntity'] is defined and assoc['targetEntity'] is not null %} {# type 1 == OneToOne, type 2 == ManyToOne #}
 
         $assoc_{{ key }} = new \{{ assoc['targetEntity'] }};
 
+
             {%- endif %}
         {%- endfor %}
-
 
         //create main object
         ${{ entity_class|lower }}_object = array();
