@@ -113,18 +113,20 @@ EOT
 
         try
         {
-            $metadataFactory = $this->getContainer()->get('validator.mapping.class_metadata_factory');
-            $constraint_metadata = $metadataFactory->getMetadataFor($entity);
+            $metadataFactory = $this->getContainer()->get('validator')->getMetadataFactory();
+            $constraint_metadata = $metadataFactory->getMetadataFor(new $entity);
             var_dump($constraint_metadata);
         }
         catch(ServiceNotFoundException $snfe)
         {
             //no constraints are checked
             $constraint_metadata = null;
+            var_dump($snfe->getMessage());
         }
         catch(\Exception $ex)
         {
             $constraint_metadata = null;
+            var_dump($ex->getMessage());
         }
 
         if ($constraint_metadata === null)
