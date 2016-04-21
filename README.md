@@ -113,7 +113,8 @@ $ php app/console voryx:generate:rest --entity="AppBundle:Post"
 Full example with all parameters
 
 ```bash
-$ php app/console voryx:generate:rest --entity="AppBundle:Post" --document --overwrite --route-prefix="api" --route-format="yml" --service-format="yml" --test="none"
+$ php app/console voryx:generate:rest --entity="AppBundle:Post" --document --resource --overwrite --route-prefix="api" --route-format="yml" --service-format="yml" --test="none"
+$ php app/console voryx:generate:rest --entity="AppBundle:User/Domain" --document --overwrite --route-prefix="api" --route-format="annotation" --service-format="yml" --test="oauth2"
 ```
 
 possible values for all parameters
