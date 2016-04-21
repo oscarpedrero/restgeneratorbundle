@@ -37,6 +37,7 @@ class DoctrineRESTGenerator extends Generator
 
     /** @var  ClassMetadataInfo */
     protected $metadata;
+    protected $constraint_metadata;
     protected $format;
     protected $actions;
 
@@ -56,6 +57,7 @@ class DoctrineRESTGenerator extends Generator
      * @param BundleInterface $bundle A bundle object
      * @param string $entity The entity relative class name
      * @param ClassMetadataInfo $metadata The entity class metadata
+     * @param $constraint_metadata
      * @param string $routePrefix The route name prefix
      * @param bool $forceOverwrite Whether or not to overwrite an existing controller
      * @param bool $resource
@@ -64,7 +66,7 @@ class DoctrineRESTGenerator extends Generator
      * @param string $service_format Format of service generation
      * @param string $test Test-mode (none, oauth or no-authentication)
      */
-    public function generate(BundleInterface $bundle,$entity,ClassMetadataInfo $metadata,$routePrefix,$forceOverwrite,$resource,$document,$format, $service_format, $test)
+    public function generate(BundleInterface $bundle,$entity,ClassMetadataInfo $metadata, $constraint_metadata,$routePrefix,$forceOverwrite,$resource,$document,$format, $service_format, $test)
     {
         $this->routePrefix = $routePrefix;
         $this->routeNamePrefix = str_replace('/', '_', $routePrefix);
@@ -85,6 +87,7 @@ class DoctrineRESTGenerator extends Generator
         $this->entity = $entity;
         $this->bundle = $bundle;
         $this->metadata = $metadata;
+        $this->constraint_metadata = $constraint_metadata;
         $this->setFormat($format);
 
         $this->generateControllerClass($forceOverwrite, $document, $resource);
@@ -487,6 +490,7 @@ class DoctrineRESTGenerator extends Generator
             throw new \RuntimeException('Unable to generate the test as it already exists.');
         }
 
+        $constraints = $this->constraint_metadata;
 
         $this->generateBaseTestCaseIfNotExists($forceOverwrite, $format, $friendlyFormat, $base_target);
 
@@ -498,6 +502,7 @@ class DoctrineRESTGenerator extends Generator
                 'friendly_format'   => $friendlyFormat,
                 'fields'            => $this->metadata->fieldMappings,
                 'assoc_mapping'     => $this->metadata->associationMappings,
+                'constraint_mapping'=> $constraints,
                 'base_file'         => $base_target,
                 'route_prefix'      => $this->routePrefix,
                 'route_name_prefix' => $this->routeNamePrefix,

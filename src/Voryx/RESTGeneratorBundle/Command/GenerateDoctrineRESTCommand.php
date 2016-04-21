@@ -13,6 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
@@ -110,9 +111,29 @@ EOT
         $resource    = $input->getOption('resource');
         $document    = $input->getOption('document');
 
+        try
+        {
+            $metadataFactory = $this->getContainer()->get('validator.mapping.class_metadata_factory');
+            $constraint_metadata = $metadataFactory->getMetadataFor($entity);
+            var_dump($constraint_metadata);
+        }
+        catch(ServiceNotFoundException $snfe)
+        {
+            //no constraints are checked
+            $constraint_metadata = null;
+        }
+        catch(\Exception $ex)
+        {
+            $constraint_metadata = null;
+            if ($test !== 'none')
+            {
+                $output->writeln('<error>No class constraint metadata factory found for entity ' . $entity . '</error>');
+            }
+        }
+
         /** @var DoctrineRESTGenerator $generator */
         $generator = $this->getGenerator($bundle);
-        $generator->generate($bundle, $entity, $metadata[0], $prefix, $forceOverwrite, $resource, $document, $format, $service_format, $test);
+        $generator->generate($bundle, $entity, $metadata[0], $constraint_metadata, $prefix, $forceOverwrite, $resource, $document, $format, $service_format, $test);
 
         $output->writeln('Generating the REST api code: <info>OK</info>');
         if ($test === 'oauth2')
