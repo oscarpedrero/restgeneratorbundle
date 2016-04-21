@@ -114,7 +114,7 @@ EOT
         try
         {
             $metadataFactory = $this->getContainer()->get('validator')->getMetadataFactory();
-            $constraint_metadata = $metadataFactory->getMetadataFor(new $entity);
+            $constraint_metadata = $metadataFactory->getMetadataFor(new $entityClass);
             var_dump($constraint_metadata);
         }
         catch(ServiceNotFoundException $snfe)
