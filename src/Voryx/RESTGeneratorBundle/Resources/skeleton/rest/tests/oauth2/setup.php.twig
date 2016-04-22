@@ -33,9 +33,16 @@
         ${{ entity_class|lower }}_object = array();
         {%- for field, info in fields if info['id'] is not defined or info['id'] == false -%}
             {%- if info['type'] == 'string' %}
-                {#{%- if constraint_mapping is not defined or constraint_mapping is null or constraint_mapping.hasPropertyMetadata(field) == false  %}#}
+                {%- set test_data = 'test_' + field %}
+                {%- if entity_constraints[{{ field }}] is defined %}
+                    {%- if 'NotBlankValidator' in entity_constraints[{{ field }}].validatedBy() %}
+                    {%- set test_data = 'test_required_field_' + field %}
+                    {%- elseif 'EmailValidator' in entity_constraints[{{ field }}].validatedBy() %}
+                    {%- set test_data = field + '@domain.com' %}
+                    {%- endif %}
+                {%- endif %}
 
-        ${{ entity_class|lower }}_object['{{ field }}'] = 'test_{{ field }}';
+        ${{ entity_class|lower }}_object['{{ field }}'] = {{ test_data }};
 
             {%- elseif info['type'] == 'text' %}
 

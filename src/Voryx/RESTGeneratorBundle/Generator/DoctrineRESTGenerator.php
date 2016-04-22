@@ -16,6 +16,8 @@ use Sensio\Bundle\GeneratorBundle\Generator\Generator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
@@ -37,7 +39,7 @@ class DoctrineRESTGenerator extends Generator
 
     /** @var  ClassMetadataInfo */
     protected $metadata;
-    protected $constraint_metadata;
+    protected $entityConstraints;
     protected $format;
     protected $actions;
 
@@ -57,7 +59,7 @@ class DoctrineRESTGenerator extends Generator
      * @param BundleInterface $bundle A bundle object
      * @param string $entity The entity relative class name
      * @param ClassMetadataInfo $metadata The entity class metadata
-     * @param $constraint_metadata
+     * @param array $entityConstraints array of fields with constraints array('field' => array(Constraint, Constraint2),'field2' => array(Constraint, Constraint2))
      * @param string $routePrefix The route name prefix
      * @param bool $forceOverwrite Whether or not to overwrite an existing controller
      * @param bool $resource
@@ -66,7 +68,7 @@ class DoctrineRESTGenerator extends Generator
      * @param string $service_format Format of service generation
      * @param string $test Test-mode (none, oauth or no-authentication)
      */
-    public function generate(BundleInterface $bundle,$entity,ClassMetadataInfo $metadata, $constraint_metadata,$routePrefix,$forceOverwrite,$resource,$document,$format, $service_format, $test)
+    public function generate(BundleInterface $bundle,$entity,ClassMetadataInfo $metadata, $entityConstraints,$routePrefix,$forceOverwrite,$resource,$document,$format, $service_format, $test)
     {
         $this->routePrefix = $routePrefix;
         $this->routeNamePrefix = str_replace('/', '_', $routePrefix);
@@ -87,7 +89,7 @@ class DoctrineRESTGenerator extends Generator
         $this->entity = $entity;
         $this->bundle = $bundle;
         $this->metadata = $metadata;
-        $this->constraint_metadata = $constraint_metadata;
+        $this->entityConstraints = $entityConstraints;
         $this->setFormat($format);
 
         $this->generateControllerClass($forceOverwrite, $document, $resource);
@@ -231,7 +233,7 @@ class DoctrineRESTGenerator extends Generator
                 'namespace' => $this->bundle->getNamespace(),
                 'entity_namespace' => $entityNamespace,
                 'format' => $this->format,
-                'document' => $document
+                'document' => $document,
             )
         );
     }
@@ -370,7 +372,7 @@ class DoctrineRESTGenerator extends Generator
                         $namespace,
                         $entityNamespace,
                         $entityClass
-                    )
+                    ),
                 )
             );
         $yml_services = $yml_file['services'];
@@ -382,9 +384,9 @@ class DoctrineRESTGenerator extends Generator
                         'class' => '%'.$newId.'.handler_class%', 'arguments' => array(
                             '@doctrine.orm.entity_manager',
                             '%'.$newId.'.entity_class%',
-                            '@form.factory'
-                        )
-                    )
+                            '@form.factory',
+                        ),
+                    ),
                 )
             );
         $yml_content = Yaml::dump($yml_file, 3);
@@ -490,29 +492,27 @@ class DoctrineRESTGenerator extends Generator
             throw new \RuntimeException('Unable to generate the test as it already exists.');
         }
 
-        $constraints = $this->constraint_metadata;
-
         $this->generateBaseTestCaseIfNotExists($forceOverwrite, $format, $friendlyFormat, $base_target);
 
         $this->renderFile(
             'rest/test.php.twig',
             $target,
             array(
-                'format'            => $format,
-                'friendly_format'   => $friendlyFormat,
-                'fields'            => $this->metadata->fieldMappings,
-                'assoc_mapping'     => $this->metadata->associationMappings,
-                'constraint_mapping'=> $constraints,
-                'base_file'         => $base_target,
-                'route_prefix'      => $this->routePrefix,
-                'route_name_prefix' => $this->routeNamePrefix,
-                'entity'            => $this->entity,
-                'bundle'            => $this->bundle->getName(),
-                'entity_class'      => $entityClass,
-                'namespace'         => $this->bundle->getNamespace(),
-                'entity_namespace'  => $entityNamespace,
-                'actions'           => $this->actions,
-                'form_type_name'    => strtolower(str_replace('\\', '_', $this->bundle->getNamespace()) . ($parts ? '_' : '') . implode('_', $parts) . '_' . $entityClass . 'Type'),
+                'format'             => $format,
+                'friendly_format'    => $friendlyFormat,
+                'fields'             => $this->metadata->fieldMappings,
+                'assoc_mapping'      => $this->metadata->associationMappings,
+                'entity_constraints' => $this->entityConstraints,
+                'base_file'          => $base_target,
+                'route_prefix'       => $this->routePrefix,
+                'route_name_prefix'  => $this->routeNamePrefix,
+                'entity'             => $this->entity,
+                'bundle'             => $this->bundle->getName(),
+                'entity_class'       => $entityClass,
+                'namespace'          => $this->bundle->getNamespace(),
+                'entity_namespace'   => $entityNamespace,
+                'actions'            => $this->actions,
+                'form_type_name'     => strtolower(str_replace('\\', '_', $this->bundle->getNamespace()) . ($parts ? '_' : '') . implode('_', $parts) . '_' . $entityClass . 'Type'),
             )
         );
     }

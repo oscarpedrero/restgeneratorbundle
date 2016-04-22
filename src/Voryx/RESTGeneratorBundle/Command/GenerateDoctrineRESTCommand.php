@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Voryx\RESTGeneratorBundle\Generator\DoctrineRESTGenerator;
 use Sensio\Bundle\GeneratorBundle\Command\Validators;
 use Voryx\RESTGeneratorBundle\Manipulator\RoutingManipulator;
@@ -110,36 +111,43 @@ EOT
         $bundle      = $this->getContainer()->get('kernel')->getBundle($bundle);
         $resource    = $input->getOption('resource');
         $document    = $input->getOption('document');
+        $constraints = array();
 
+        $constraintMetadata = null;
         try
         {
-            $metadataFactory = $this->getContainer()->get('validator')->getMetadataFactory();
-            $constraint_metadata = $metadataFactory->getMetadataFor(new $entityClass);
-            var_dump($constraint_metadata);
+            /** @var \Symfony\Component\Validator\Validator\RecursiveValidator $validator */
+            $validator = $this->getContainer()->get('validator');
+
+            /** @var ClassMetadata $constraintMetadata */
+            $constraintMetadata = $validator->getMetadataFor(new $entityClass);
+            foreach($constraintMetadata->getConstrainedProperties() as $property)
+            {
+                //var_dump($constraint_metadata->getPropertyMetadata($property));
+                $constraints[$property] = $constraintMetadata->getPropertyMetadata($property)[0]->constraints;
+            }
         }
-        catch(ServiceNotFoundException $snfe)
+        catch(ServiceNotFoundException $snfex)
         {
             //no constraints are checked
-            $constraint_metadata = null;
-            var_dump($snfe->getMessage());
+            $output->writeln($snfex->getMessage());
         }
         catch(\Exception $ex)
         {
-            $constraint_metadata = null;
-            var_dump($ex->getMessage());
+            $output->writeln($ex->getMessage());
         }
 
-        if ($constraint_metadata === null)
+        if ($constraintMetadata === null)
         {
             if ($test !== 'none')
             {
-                $output->writeln('<error>No class constraint metadata factory found for entity ' . $entity . '</error>');
+                $output->writeln('<error>No class constraint metadata found for entity ' . $entityClass . '</error>');
             }
         }
 
         /** @var DoctrineRESTGenerator $generator */
         $generator = $this->getGenerator($bundle);
-        $generator->generate($bundle, $entity, $metadata[0], $constraint_metadata, $prefix, $forceOverwrite, $resource, $document, $format, $service_format, $test);
+        $generator->generate($bundle, $entity, $metadata[0], $constraints, $prefix, $forceOverwrite, $resource, $document, $format, $service_format, $test);
 
         $output->writeln('Generating the REST api code: <info>OK</info>');
         if ($test === 'oauth2')
