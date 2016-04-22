@@ -34,10 +34,10 @@
         {%- for field, info in fields if info['id'] is not defined or info['id'] == false -%}
             {%- if info['type'] == 'string' %}
                 {%- set test_data = 'test_' + field %}
-                {%- if entity_constraints[{{ field }}] is defined %}
-                    {%- if 'NotBlankValidator' in entity_constraints[{{ field }}].validatedBy() %}
+                {%- if entity_constraints[field] is defined %}
+                    {%- if 'NotBlankValidator' in entity_constraints[field].validatedBy() %}
                     {%- set test_data = 'test_required_field_' + field %}
-                    {%- elseif 'EmailValidator' in entity_constraints[{{ field }}].validatedBy() %}
+                    {%- elseif 'EmailValidator' in entity_constraints[field].validatedBy() %}
                     {%- set test_data = field + '@domain.com' %}
                     {%- endif %}
                 {%- endif %}
