@@ -77,6 +77,12 @@
                             {%- set test_data = 'nl' %}
                         {%- elseif 'CurrencyValidator' in constraint.validatedBy() %}
                             {%- set test_data = 'EUR' %}
+                        {%- elseif 'LengthValidator' in constraint.validatedBy() %}
+                            {% set random_number = random(constraint.max - constraint.min) + constraint.min %}
+                            {% set test_data = '' %}
+                            {% for 0..random_number %}
+                                {% set test_data = test_data ~ random('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890') %}
+                            {% endfor %}
                         {%- elseif 'UuidValidator' in constraint.validatedBy() %}
                         {#- might want to check uuid versions and strict mode? #}
                             {%- set test_data = '123e4567-e89b-12d3-a456-426655440000' %}
