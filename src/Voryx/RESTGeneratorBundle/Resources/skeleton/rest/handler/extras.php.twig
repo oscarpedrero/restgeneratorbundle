@@ -10,7 +10,11 @@
      */
     private function processForm({{ entity_class }} ${{ entity_class|lower }}, array $parameters, $method = "PUT")
     {
+<<<<<<< HEAD
         $form = $this->formFactory->create(new {{ entity_class }}Type(), ${{ entity_class|lower }}, array('method' => $method));
+=======
+        $form = $this->formFactory->create(get_class(new {{ entity_class }}Type()), ${{ entity_class|lower }}, array('method' => $method));
+>>>>>>> be3e8d5ea0767bf1a6d344381124434ff1bcf4cc
         $form->submit($parameters, 'PATCH' !== $method);
         if ($form->isValid()) {
             ${{ entity_class|lower }} = $form->getData();
