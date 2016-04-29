@@ -18,6 +18,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use Voryx\RESTGeneratorBundle\Generator\DoctrineRESTGenerator;
 use Sensio\Bundle\GeneratorBundle\Command\Validators;
@@ -298,7 +299,21 @@ EOT
             $bundle_name = str_replace("Bundle", "", $bundle->getName());
             $route_name = $bundle_name;
             $yml_file_location = $this->getContainer()->getParameter('kernel.root_dir') . '/config/routing.yml';
-            $yml_file = Yaml::parse(file_get_contents($yml_file_location));
+            try
+            {
+                $yml_file = Yaml::parse(file_get_contents($yml_file_location));
+            }
+            catch(ParseException $pex)
+            {
+                return array(
+                    '<error>Could not read yaml file '.$yml_file_location.'</error>',
+                    'On line',
+                    'parsed line: '.$pex->getParsedLine() . ' and current line '. $pex->getLine(),
+                    'With snippet '.$pex->getSnippet(),
+                    'Exception message:',
+                    '<error>'.$pex->getMessage().'</error>'
+                    );
+            }
             $resource_location = sprintf('@%s/Controller/', $bundle->getName());
 
             $bundle_routing = $yml_file[$route_name];
@@ -319,7 +334,6 @@ EOT
 
             $yml_file[$route_name] = $bundle_routing;
 
-            //do something with bundle_routing (a.k.a. put it in the file).
             $yml_content = Yaml::dump($yml_file, 3);
             file_put_contents($yml_file_location, $yml_content);
 
