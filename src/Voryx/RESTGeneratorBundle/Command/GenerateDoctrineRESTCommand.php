@@ -338,10 +338,10 @@ EOT
 
             $yml_file[$route_name] = $bundle_routing;
 
-            $yml_content = Yaml::dump($yml_file, 3);
+            $yml_content = Yaml::dump($yml_file, 2);
             file_put_contents($yml_file_location, $yml_content);
 
-            return array(' - Added an annotation routing reference to your routing.yml file.');
+            return array();
         }
 
         $routing = new RoutingManipulator($this->getContainer()->getParameter('kernel.root_dir') . '/config/routing.yml');
