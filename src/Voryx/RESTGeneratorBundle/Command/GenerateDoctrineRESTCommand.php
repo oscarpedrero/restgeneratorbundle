@@ -297,7 +297,7 @@ EOT
         if ($format === 'annotation')
         {
             $bundle_name = str_replace("Bundle", "", $bundle->getName());
-            $route_name = $bundle_name;
+            $route_name = strtolower($bundle_name);
             $yml_file_location = $this->getContainer()->getParameter('kernel.root_dir') . '/config/routing.yml';
             try
             {
@@ -316,7 +316,11 @@ EOT
             }
             $resource_location = sprintf('@%s/Controller/', $bundle->getName());
 
-            $bundle_routing = $yml_file[$route_name];
+            $bundle_routing = null;
+            if (array_key_exists($route_name, $yml_file))
+            {
+                $bundle_routing = $yml_file[$route_name];
+            }
 
             if (is_array($bundle_routing))
             {
