@@ -19,7 +19,7 @@
         "symfony/symfony": ">=2.8",
         "sensio/generator-bundle": "~3.0",
         "friendsofsymfony/rest-bundle": "^2.2",
-        "jms/serializer-bundle": "^3",
+        "jms/serializer-bundle": "^2.0",
         "nelmio/cors-bundle": "~1.5",
         "nelmio/api-doc-bundle": "^3.0",
         "doctrine/orm": ">=2.0"
